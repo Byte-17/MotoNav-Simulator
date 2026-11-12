@@ -1,0 +1,49 @@
+MotoNav 1.85B desktop simulator - build provenance
+=================================================
+
+Package        MotoNav-Simulator-1.85B-win64
+Built          2026-11-12
+Target board   1.85B panel variant 0 (466x466 logical canvas -> 360x360 physical panel)
+Firmware tree  7.12.3-185B
+
+Source
+  repository   zyn950929/MotoNav
+  commit       5ce511114c372ff015fc22f39b4cdf031ca14119 (short 5ce5111)
+  working tree built from this commit plus uncommitted local edits in
+               simulator/host/{SimUi.cpp,SimWindow.cpp,main.cpp,SimDevice.h},
+               boards/185b/MotoNav/ui/{UiConfig.h,UiPages.h} and the new
+               ui/UiDashboardLayout.h; sources were not changed for packaging
+  simulator    motonav/firmware/simulator/
+  shared UI    motonav/firmware/boards/185b/MotoNav/ui/
+  graphics     motonav/firmware/libraries/GFX_Library_for_Arduino/
+
+Toolchain
+  compiler     clang version 23.1.5, target x86_64-w64-windows-gnu (MSYS2 UCRT64)
+  python       3.13.13 (build driver only; not needed at runtime)
+  flags        -std=c++17 -O2 -fno-exceptions -fno-rtti -DNDEBUG -DMOTONAV_SIMULATOR=1
+  link         -static -s -luser32 -lgdi32
+
+Runtime dependencies (all shipped with Windows)
+  KERNEL32.dll, USER32.dll, GDI32.dll, api-ms-win-crt-*.dll (UCRT)
+  No Visual C++ redistributable, no MSYS2 runtime, no DLL beside the exe.
+
+Verification performed on the build machine (Windows, x64)
+  clean build                 python motonav/firmware/simulator/build.py --clean  -> ok
+  scene enumeration           motonav-sim --list-scenes                          -> 20 scenes
+  headless panel export       --scene cells-demo --headless --frames 3 --screenshot -> 360x360 PNG
+  scene contract suite        python motonav/firmware/tests/simulator_scene_test.py
+                              -> 18 of 19 pass. The failing one is pre-existing and
+                                 unrelated to packaging: the test asks for scenes
+                                 dashboard-speed-zero / dashboard-speed-32, which the
+                                 current simulator does not define, so it errors with
+                                 "unknown scene".
+
+Not verified / out of scope
+  No real device flashing, no real phone Bluetooth, no map or weather service, no QSPI
+  timing, no panel frame rate. Desktop frame rate and memory use do not represent ESP32.
+  The navigation page is not ported: nav-arrow / nav-cruise / nav-stale render
+  "NAV PAGE NOT PORTED YET" on screen by design.
+
+Licence
+  See LICENSE.md (project non-commercial terms). Third-party components, fonts, trademarks,
+  map and weather data keep their own licences.
